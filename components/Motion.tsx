@@ -1,17 +1,15 @@
 
-import React, { useRef, useLayoutEffect, useEffect } from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// --- PHYSICS PRESETS (GSAP MAPPING) ---
-// Elite: Crisp, no overshoot, mechanical precision.
-const EASE_ELITE = "power4.out"; 
-// Punch: Sharp impact, slight overshoot.
-const EASE_PUNCH = "back.out(1.7)";
-// Boom: Heavy, satisfying bounce.
-const EASE_BOOM = "elastic.out(1, 0.5)";
+export const PHYSICS = {
+    ELITE: "power4.out", 
+    PUNCH: "back.out(1.7)", 
+    BOOM: "elastic.out(1, 0.5)"
+};
 
 export const useGSAPContext = (scope: React.RefObject<HTMLElement>) => {
   const ctx = useRef<gsap.Context>();
@@ -21,7 +19,6 @@ export const useGSAPContext = (scope: React.RefObject<HTMLElement>) => {
   }, [scope]);
 };
 
-// 1. CyberCard: Matte-Dark Physics
 interface CyberCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   glowColor?: string;
@@ -33,19 +30,29 @@ export const CyberCard: React.FC<CyberCardProps> = ({ children, className = "", 
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // Hover Physics
       const card = cardRef.current;
       if (!card) return;
+      
+      gsap.set(card, { willChange: "transform, opacity, box-shadow", transformStyle: "preserve-3d" });
 
-      card.addEventListener('mouseenter', () => {
-        gsap.to(card, { y: -8, scale: 1.02, duration: 0.4, ease: EASE_ELITE, boxShadow: `0 10px 30px -10px ${glowColor}40` });
-        gsap.to(contentRef.current, { y: -2, duration: 0.4, ease: EASE_ELITE });
-      });
+      const tl = gsap.timeline({ paused: true });
+      tl.to(card, { 
+          y: -10, 
+          scale: 1.03, 
+          duration: 0.4, 
+          ease: PHYSICS.ELITE,
+          boxShadow: `0 20px 40px -10px ${glowColor}20`,
+          borderColor: `${glowColor}60`
+      })
+      .to(contentRef.current, { 
+          y: -4, 
+          duration: 0.4, 
+          ease: PHYSICS.ELITE 
+      }, "<");
 
-      card.addEventListener('mouseleave', () => {
-        gsap.to(card, { y: 0, scale: 1, duration: 0.6, ease: EASE_ELITE, boxShadow: 'none' });
-        gsap.to(contentRef.current, { y: 0, duration: 0.6, ease: EASE_ELITE });
-      });
+      card.addEventListener('mouseenter', () => tl.play());
+      card.addEventListener('mouseleave', () => tl.reverse());
+
     }, cardRef);
     return () => ctx.revert();
   }, [glowColor]);
@@ -53,20 +60,17 @@ export const CyberCard: React.FC<CyberCardProps> = ({ children, className = "", 
   return (
     <div 
       ref={cardRef} 
-      className={`relative rounded-xl bg-[#0c0c0e] border border-white/5 will-change-transform overflow-hidden ${className}`}
-      style={{ transformStyle: 'preserve-3d' }}
+      className={`relative rounded-xl bg-[#0c0c0e] border border-white/5 overflow-hidden cursor-pointer ${className}`}
       {...props}
     >
       <div ref={contentRef} className="relative z-10">
         {children}
       </div>
-      {/* Scanline Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent opacity-0 hover:opacity-100 pointer-events-none transition-opacity duration-300 mix-blend-overlay" />
+      <div className="absolute inset-0 bg-[linear-gradient(transparent_0%,rgba(255,255,255,0.05)_50%,transparent_100%)] translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-1000 pointer-events-none mix-blend-overlay" />
     </div>
   );
 };
 
-// 2. NeonSpring: Tactical Click Button
 interface NeonSpringProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
@@ -76,13 +80,17 @@ export const NeonSpring: React.FC<NeonSpringProps> = ({ children, className = ""
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (btnRef.current) {
-      // Punch Effect
       gsap.fromTo(btnRef.current, 
-        { scale: 0.95 }, 
-        { scale: 1, duration: 0.4, ease: EASE_BOOM }
+        { scale: 0.92 }, 
+        { scale: 1, duration: 0.4, ease: PHYSICS.BOOM }
       );
-      
-      // Ripple Logic could go here via DOM append, keeping it lightweight for now
+      gsap.to(btnRef.current, {
+          backgroundColor: "#ffffff",
+          duration: 0.05,
+          yoyo: true,
+          repeat: 1,
+          ease: "power2.inOut"
+      });
     }
     if (onClick) onClick(e);
   };
@@ -92,12 +100,19 @@ export const NeonSpring: React.FC<NeonSpringProps> = ({ children, className = ""
     if (!btn) return;
 
     const ctx = gsap.context(() => {
-      btn.addEventListener('mouseenter', () => {
-        gsap.to(btn, { scale: 1.05, duration: 0.3, ease: EASE_PUNCH });
-      });
-      btn.addEventListener('mouseleave', () => {
-        gsap.to(btn, { scale: 1, duration: 0.3, ease: EASE_ELITE });
-      });
+        gsap.set(btn, { willChange: "transform" });
+        
+        const hoverTl = gsap.timeline({ paused: true });
+        hoverTl.to(btn, { 
+            y: -6, 
+            scale: 1.04, 
+            duration: 0.3, 
+            ease: PHYSICS.ELITE,
+            boxShadow: "0 10px 20px rgba(0,255,192,0.2)"
+        });
+
+        btn.addEventListener('mouseenter', () => hoverTl.play());
+        btn.addEventListener('mouseleave', () => hoverTl.reverse());
     }, btnRef);
     return () => ctx.revert();
   }, []);
@@ -106,7 +121,7 @@ export const NeonSpring: React.FC<NeonSpringProps> = ({ children, className = ""
     <button
       ref={btnRef}
       onClick={handleClick}
-      className={`relative will-change-transform ${className}`}
+      className={`relative ${className}`}
       {...props}
     >
       {children}
@@ -114,7 +129,6 @@ export const NeonSpring: React.FC<NeonSpringProps> = ({ children, className = ""
   );
 };
 
-// 3. RevealContainer: Staggered Assault
 export const RevealContainer: React.FC<{ children?: React.ReactNode, className?: string, delay?: number }> = ({ children, className = "", delay = 0 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -123,15 +137,15 @@ export const RevealContainer: React.FC<{ children?: React.ReactNode, className?:
       const items = containerRef.current?.children;
       if (items) {
         gsap.fromTo(items, 
-          { y: 20, opacity: 0, filter: "blur(4px)" },
+          { y: 40, opacity: 0, filter: "blur(4px)" },
           {
             y: 0,
             opacity: 1,
             filter: "blur(0px)",
-            duration: 0.6,
+            duration: 0.8,
             stagger: 0.08,
             delay: delay,
-            ease: EASE_ELITE,
+            ease: PHYSICS.ELITE,
             scrollTrigger: {
               trigger: containerRef.current,
               start: "top 85%",
@@ -151,14 +165,12 @@ export const RevealContainer: React.FC<{ children?: React.ReactNode, className?:
   );
 };
 
-// 4. RevealItem: Wrapper for individual items if needed manually
 export const RevealItem: React.FC<{ children?: React.ReactNode, className?: string }> = ({ children, className = "" }) => (
   <div className={`will-change-transform ${className}`}>
     {children}
   </div>
 );
 
-// 5. ParallaxLayer: Deep Field
 export const ParallaxLayer: React.FC<{ children?: React.ReactNode, speed?: number, className?: string }> = ({ children, speed = 0.5, className = "" }) => {
   const layerRef = useRef<HTMLDivElement>(null);
 
@@ -180,3 +192,4 @@ export const ParallaxLayer: React.FC<{ children?: React.ReactNode, speed?: numbe
 
   return <div ref={layerRef} className={`will-change-transform ${className}`}>{children}</div>;
 };
+    

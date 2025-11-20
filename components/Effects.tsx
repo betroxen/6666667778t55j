@@ -1,26 +1,24 @@
 
 import React, { useState } from 'react';
 
-// Utility for class merging – strict and type-safe
 export function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-// --- 1. NEON GLOW ---
-export const NeonGlow = ({
-  children,
-  intensity = "md",
-  color = "neon-surge",
-  glow = true,
-  animate = true,
-  className,
-}: {
+export const NeonGlow: React.FC<{
   children?: React.ReactNode,
   intensity?: "sm" | "md" | "lg" | "xl",
   color?: "neon-surge" | "blood" | "purple",
   glow?: boolean,
   animate?: boolean,
   className?: string
+}> = ({
+  children,
+  intensity = "md",
+  color = "neon-surge",
+  glow = true,
+  animate = true,
+  className,
 }) => {
   const glowMap = {
     "neon-surge": "shadow-[0_0_20px_#00FFC0,0_0_60px_#00FFC066]",
@@ -47,21 +45,20 @@ export const NeonGlow = ({
   );
 };
 
-// --- 2. FROSTED GLASS ---
-export const FrostedGlass = ({
-  children,
-  blur = "xl",
-  opacity = 70,
-  borderColor = "white/5",
-  corners = "xl",
-  className
-}: {
+export const FrostedGlass: React.FC<{
   children?: React.ReactNode,
   blur?: "sm" | "md" | "lg" | "xl",
   opacity?: number,
   borderColor?: string,
   corners?: "md" | "lg" | "xl",
   className?: string
+}> = ({
+  children,
+  blur = "xl",
+  opacity = 70,
+  borderColor = "white/5",
+  corners = "xl",
+  className
 }) => {
   const blurMap = { sm: "backdrop-blur-sm", md: "backdrop-blur-md", lg: "backdrop-blur-lg", xl: "backdrop-blur-2xl" };
   const radiusMap = { md: "rounded-lg", lg: "rounded-xl", xl: "rounded-2xl" };
@@ -77,14 +74,12 @@ export const FrostedGlass = ({
         className
       )}
     >
-      {/* Layer: faint nebula gradient */}
       <div className="absolute inset-0 pointer-events-none -z-10 rounded-inherit bg-gradient-to-br from-neon-surge/5 via-purple-500/5 to-transparent opacity-20" />
       {children}
     </div>
   );
 };
 
-// --- 3. TACTICAL ICON ---
 export const TacticalIcon: React.FC<{
   children: React.ReactNode;
   pulse?: boolean;
@@ -108,8 +103,7 @@ export const TacticalIcon: React.FC<{
   );
 };
 
-// --- 4. PROGRESS GLOW ---
-export const ProgressGlow = ({ progress, color = "neon-surge", className }: { progress: number, color?: "neon-surge" | "yellow" | "purple", className?: string }) => {
+export const ProgressGlow: React.FC<{ progress: number, color?: "neon-surge" | "yellow" | "purple", className?: string }> = ({ progress, color = "neon-surge", className }) => {
    const colorMap = {
     "neon-surge": "bg-[#00FFC0] shadow-[0_0_10px_#00FFC0]",
     "yellow": "bg-yellow-500 shadow-[0_0_10px_#EAB308]",
@@ -126,8 +120,7 @@ export const ProgressGlow = ({ progress, color = "neon-surge", className }: { pr
    )
 }
 
-// --- 5. ANIMATED GRADIENT ---
-export const AnimatedGradient = ({ dark = true }: { dark?: boolean }) => (
+export const AnimatedGradient: React.FC<{ dark?: boolean }> = ({ dark = true }) => (
     <div className={cn(
         "absolute inset-0 pointer-events-none -z-10",
         dark ? "bg-black" : "bg-[#050505]"
@@ -137,8 +130,7 @@ export const AnimatedGradient = ({ dark = true }: { dark?: boolean }) => (
     </div>
 )
 
-// --- 6. PARALLAX TILT ---
-export const ParallaxTilt = ({ children, className, intensity = 15 }: { children?: React.ReactNode, className?: string, intensity?: number }) => {
+export const ParallaxTilt: React.FC<{ children?: React.ReactNode, className?: string, intensity?: number }> = ({ children, className, intensity = 15 }) => {
     const [transform, setTransform] = useState("");
 
     const handleMove = (e: React.MouseEvent) => {
@@ -163,3 +155,4 @@ export const ParallaxTilt = ({ children, className, intensity = 15 }: { children
         </div>
     )
 }
+    

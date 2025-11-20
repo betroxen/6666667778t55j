@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useRef, useLayoutEffect, useState, ReactNode } from 'react';
 import { Icons } from './icons';
+import { gsap } from 'gsap';
 
 interface AccordionContextType {
   openValues: string[];
@@ -41,84 +42,76 @@ export const Accordion: React.FC<AccordionProps> = ({ children, multiple = false
   );
 };
 
-interface AccordionItemProps {
-  children?: ReactNode;
-  value: string;
-  className?: string;
-}
-
-export const AccordionItem: React.FC<AccordionItemProps> = ({ children, value, className }) => {
+export const AccordionItem: React.FC<{ children?: ReactNode; value: string; className?: string }> = ({ children, value, className }) => {
   const context = useContext(AccordionContext);
-  if (!context) {
-    throw new Error('AccordionItem must be used within an Accordion');
-  }
+  if (!context) throw new Error('AccordionItem must be used within an Accordion');
   const isOpen = context.openValues.includes(value);
 
   return (
     <AccordionItemContext.Provider value={{ value, isOpen }}>
-        <div className={className !== undefined ? className : "border-b border-[#333] last:border-b-0"}>
+        <div className={className || "border-b border-[#333] last:border-b-0"}>
             {children}
         </div>
     </AccordionItemContext.Provider>
   );
 };
 
-interface AccordionTriggerProps {
-  children?: ReactNode;
-  className?: string;
-}
-
-export const AccordionTrigger: React.FC<AccordionTriggerProps> = ({ children, className }) => {
+export const AccordionTrigger: React.FC<{ children?: ReactNode; className?: string }> = ({ children, className }) => {
   const context = useContext(AccordionContext);
   const itemContext = useContext(AccordionItemContext);
-  
-  if (!context || !itemContext) {
-    throw new Error('AccordionTrigger must be used within an AccordionItem');
-  }
-
+  if (!context || !itemContext) throw new Error('Trigger err');
   const { value, isOpen } = itemContext;
+  const iconRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useLayoutEffect(() => {
+      const ctx = gsap.context(() => {
+          gsap.to(iconRef.current, {
+              rotation: isOpen ? 180 : 0,
+              duration: 0.4,
+              ease: "back.out(1.7)"
+          });
+      });
+      return () => ctx.revert();
+  }, [isOpen]);
 
   return (
     <button
-      className={className || "flex w-full items-center justify-between py-4 text-left group transition-colors focus:outline-none"}
+      ref={triggerRef}
+      className={className || "flex w-full items-center justify-between py-4 text-left group focus:outline-none"}
       onClick={() => context.toggleItem(value)}
-      aria-expanded={isOpen}
+      onMouseEnter={() => gsap.to(triggerRef.current, { x: 4, duration: 0.3, ease: "power2.out" })}
+      onMouseLeave={() => gsap.to(triggerRef.current, { x: 0, duration: 0.3, ease: "power2.out" })}
     >
-      <div className="flex-1">
-        {children}
+      <div className="flex-1">{children}</div>
+      <div ref={iconRef}>
+        <Icons.ChevronDown className="h-5 w-5 shrink-0 text-neon-surge" />
       </div>
-      <Icons.ChevronDown className={`h-5 w-5 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'} text-neon-surge`} />
     </button>
   );
 };
 
-interface AccordionContentProps {
-  children?: ReactNode;
-  className?: string;
-}
-
-export const AccordionContent: React.FC<AccordionContentProps> = ({ children, className }) => {
-  const itemContext = useContext(AccordionItemContext);
-   if (!itemContext) {
-    throw new Error('AccordionContent must be used within an AccordionItem');
-  }
-  const { isOpen } = itemContext;
-
+export const AccordionContent: React.FC<{ children?: ReactNode; className?: string }> = ({ children, className }) => {
+  const { isOpen } = useContext(AccordionItemContext)!;
   const contentRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(isOpen ? 'auto' : '0px');
 
   useLayoutEffect(() => {
-    if (contentRef.current) {
-      setHeight(isOpen ? `${contentRef.current.scrollHeight}px` : '0px');
-    }
-  }, [isOpen, children]);
+    const el = contentRef.current;
+    if (!el) return;
+
+    const ctx = gsap.context(() => {
+        if (isOpen) {
+            gsap.set(el, { height: "auto" });
+            gsap.from(el, { height: 0, duration: 0.5, ease: "power4.out" });
+        } else {
+            gsap.to(el, { height: 0, duration: 0.4, ease: "power3.in" });
+        }
+    });
+    return () => ctx.revert();
+  }, [isOpen]);
 
   return (
-    <div
-      ref={contentRef}
-      style={{ height, transition: 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
-      className={`overflow-hidden ${className || ''}`}
-    >
+    <div ref={contentRef} className={`overflow-hidden ${className || ''}`} style={{ height: 0 }}>
       {children}
     </div>
   );

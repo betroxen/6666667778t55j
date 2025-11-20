@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { AppContext } from './context/AppContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -40,14 +40,47 @@ import { RegisterModal } from './components/RegisterModal';
 import { ReviewModal } from './components/ReviewModal';
 import { Toaster } from './components/Toaster';
 
+// Import Lenis and GSAP
+import Lenis from '@studio-freight/lenis';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
 function App() {
   const appContext = useContext(AppContext);
+  const lenisRef = useRef<Lenis | null>(null);
+  
   if (!appContext) return null;
 
   const {
     isCollapsed, isMobileOpen, setIsMobileOpen,
     isLoggedIn, login, logout, openLoginModal, openRegisterModal, openReviewModal, setCurrentPage
   } = appContext;
+
+  // --- LENIS INTEGRATION ---
+  useEffect(() => {
+      const lenis = new Lenis({
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          smoothWheel: true,
+          smoothTouch: false, // Disable on touch to prevent scrolling conflicts
+          normalizeWheel: true,
+      });
+      lenisRef.current = lenis;
+
+      // Sync GSAP ScrollTrigger
+      lenis.on('scroll', ScrollTrigger.update);
+      
+      gsap.ticker.add((time) => {
+          lenis.raf(time * 1000);
+      });
+      
+      gsap.ticker.lagSmoothing(0); // Kill lag for instant response
+
+      return () => {
+          lenis.destroy();
+          gsap.ticker.remove((time) => { lenis.raf(time * 1000) });
+      };
+  }, []);
 
   const renderPage = () => {
     switch (appContext.currentPage) {
@@ -85,9 +118,7 @@ function App() {
     }
   };
 
-  // CSS variable for sidebar width to allow GSAP to animate it smoothly if needed, 
-  // or just use the prop if the Sidebar handles the width animation on the main container.
-  // For this implementation, the sidebar is fixed, so we adjust the main content padding.
+  // Sidebar width variable
   const sidebarWidth = isCollapsed ? '72px' : '256px';
 
   if (!isLoggedIn) {

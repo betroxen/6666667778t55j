@@ -1,9 +1,9 @@
 
-import React, { useContext, useState, useRef, useLayoutEffect, useEffect } from 'react';
+import React, { useContext, useState, useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { Icons } from './icons';
 import { AppContext } from '../context/AppContext';
-import { sidebarNavItems, SidebarItem, SidebarGroup } from '../constants/sidebar';
+import { sidebarNavItems, SidebarGroup, SidebarItem } from '../constants/sidebar';
 import { Button } from './Button';
 import { ProgressBar } from './ProgressBar';
 import { ZapLogo } from './ZapLogo';
@@ -32,7 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed, i
                 gsap.to(sidebarRef.current, {
                     width: isCollapsed ? 72 : 256,
                     duration: 0.5,
-                    ease: "power4.out" // Elite spring feel
+                    ease: "power4.out"
                 });
             }
         }, sidebarRef);
@@ -69,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed, i
 
     // --- RENDER HELPERS ---
 
-    const renderLink = (item: SidebarItem, isMobile = false) => {
+    const renderLink = (item: SidebarItem, isMobile = false): React.ReactNode => {
         const isActive = appContext?.currentPage === item.title;
         return (
             <a
@@ -118,7 +118,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed, i
         const containerRef = useRef<HTMLDivElement>(null);
 
         useLayoutEffect(() => {
-            if (isCollapsed) return; // No accordion anim in collapsed mode
+            if (isCollapsed) return;
             gsap.to(containerRef.current, {
                 height: isOpen ? 'auto' : 0,
                 opacity: isOpen ? 1 : 0,
@@ -127,11 +127,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed, i
             });
         }, [isOpen, isCollapsed]);
 
-        // Collapsed Mode: Just show icons in a stack
         if (isCollapsed) {
              return (
-                <div className="mb-4 pb-4 border-b border-[#222] last:border-0">
-                     {group.items.map((item: any) => renderLink(item))}
+                <div className="mb-4 pb-4 border-b border-[#222] last:border-b-0">
+                     {group.items.map((item) => renderLink(item))}
                 </div>
             );
         }
@@ -150,7 +149,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed, i
 
                 <div ref={containerRef} className="overflow-hidden h-0 opacity-0">
                     <div className="pt-1 pb-2 pl-2">
-                        {group.items.map((item: any) => renderLink(item))}
+                        {group.items.map((item) => renderLink(item))}
                     </div>
                 </div>
             </div>
@@ -159,7 +158,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed, i
 
     return (
     <>
-      {/* === MOBILE DRAWER === */}
       <div 
         ref={backdropRef}
         className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-xl opacity-0 pointer-events-none md:hidden" 
@@ -213,12 +211,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed, i
          </div>
       </div>
 
-      {/* === DESKTOP SIDEBAR === */}
       <aside 
         ref={sidebarRef}
         className="hidden md:flex fixed left-0 top-0 bottom-0 flex-col border-r border-[#222] bg-[#050505] z-40 w-64 overflow-hidden"
       >
-        {/* Header */}
         <div className="flex items-center justify-center h-16 shrink-0 border-b border-[#222] bg-[#080808]">
           <button onClick={() => appContext?.setCurrentPage('Dashboard')} className="flex items-center gap-3 group">
             <ZapLogo iconClassName="h-6 w-6" className="p-1.5 rounded-lg"/>
@@ -231,14 +227,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed, i
           </button>
         </div>
 
-        {/* Nav Content */}
         <div className="flex-1 overflow-y-auto custom-scrollbar py-6 px-3 space-y-1">
             {sidebarNavItems.map((group) => (
                 <AccordionGroup key={group.id} group={group} />
             ))}
         </div>
 
-        {/* Collapse Toggle */}
         <div className="shrink-0 border-t border-[#222] bg-[#080808] p-4 flex justify-center">
              <button
                 className="text-[#666] hover:text-white transition-colors p-2 rounded-lg hover:bg-[#222]"
