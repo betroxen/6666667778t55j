@@ -1,20 +1,26 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>ZAP // TACTICAL DATA ARCHITECT</title>
+
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Preconnect & Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind Config -->
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              'foundation': '#121212',
+              foundation: '#121212',
               'foundation-light': '#1A1A1A',
               'foundation-lighter': '#2A2A2A',
               'neon-surge': '#00FFC0',
@@ -27,7 +33,7 @@
             fontFamily: {
               orbitron: ['Orbitron', 'sans-serif'],
               'roboto-mono': ['Roboto Mono', 'monospace'],
-              'rajdhani': ['Rajdhani', 'sans-serif'],
+              rajdhani: ['Rajdhani', 'sans-serif'],
               'jetbrains-mono': ['JetBrains Mono', 'monospace'],
             },
             boxShadow: {
@@ -40,54 +46,79 @@
         },
       }
     </script>
+
     <style>
-        body {
-            background-color: #050505; /* Matte Dark Base */
-            font-family: 'Rajdhani', sans-serif;
-            color: #FFFFFF;
-            overflow: hidden; /* Handled by Lenis */
-            height: 100%;
-        }
-        html {
-            height: 100%;
-            overflow: hidden;
-        }
-        
-        /* Lenis Required Styles */
-        html.lenis, html.lenis body {
-          height: auto;
-        }
-        .lenis.lenis-smooth {
-          scroll-behavior: auto !important;
-        }
-        .lenis.lenis-smooth [data-lenis-prevent] {
-          overscroll-behavior: contain;
-        }
-        .lenis.lenis-stopped {
-          overflow: hidden;
-        }
-        .lenis.lenis-scrolling iframe {
-          pointer-events: none;
-        }
+      /* Base and Reset */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background-color: #050505; /* Matte Dark Base */
+        font-family: 'Rajdhani', sans-serif;
+        color: #FFFFFF;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+      }
 
-        .text-glow { text-shadow: 0 0 12px rgba(0, 255, 192, 0.6); }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #121212; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #00FFC0; border-radius: 20px; }
+      /* Lenis (smooth scroll) Required Styles */
+      html.lenis,
+      html.lenis body {
+        height: auto;
+      }
 
-        .mask-image-lr {
-          -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
-          mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
-        }
-        
-        /* Utility for GPU forcing */
-        .gpu-accelerated {
-            will-change: transform, opacity;
-            transform: translateZ(0);
-        }
+      .lenis.lenis-smooth {
+        scroll-behavior: auto !important;
+      }
+
+      .lenis.lenis-smooth [data-lenis-prevent] {
+        overscroll-behavior: contain;
+      }
+
+      .lenis.lenis-stopped {
+        overflow: hidden;
+      }
+
+      .lenis.lenis-scrolling iframe {
+        pointer-events: none;
+      }
+
+      /* Custom Scrollbar */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #121212;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #00ffc0;
+        border-radius: 20px;
+      }
+
+      /* Text Glow Utility */
+      .text-glow {
+        text-shadow: 0 0 12px rgba(0, 255, 192, 0.6);
+      }
+
+      /* Mask Image Left-Right Gradient */
+      .mask-image-lr {
+        -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0) 100%);
+        mask-image: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0) 100%);
+      }
+
+      /* GPU acceleration optimization */
+      .gpu-accelerated {
+        will-change: transform, opacity;
+        transform: translateZ(0);
+      }
     </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-  <script type="importmap">
+
+    <!-- Crypto-JS for hashing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js" integrity="sha512-GO5pXUnyhBFmWZBB88nrh+0u3cASuSXGGHCEtx+Ezbg7cE8U9g9nPYwK6uzF9BN0Prlbjp-SkeHG/MXKcZ7CWg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Importmap for ES modules with stable CDN paths -->
+    <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@18.2.0",
@@ -105,13 +136,13 @@
     "@studio-freight/lenis": "https://esm.sh/@studio-freight/lenis@1.0.42",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "gsap/": "https://aistudiocdn.com/gsap@^3.13.0/",
-    "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/"
+    "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/",
+    "gsap/": "https://aistudiocdn.com/gsap@^3.13.0/"
   }
 }
 </script>
-</head>
-  <body>
-    <div id="root"></div>
+  </head>
+  <body class="h-full">
+    <div id="root" class="min-h-full"></div>
   </body>
 </html>
