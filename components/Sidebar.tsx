@@ -69,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed, i
 
     // --- RENDER HELPERS ---
 
-    const renderLink = (item: SidebarItem, isMobile = false): React.ReactElement => {
+    const renderLink = (item: SidebarItem, isMobile = false): React.ReactNode => {
         const isActive = appContext?.currentPage === item.title;
         return (
             <a
