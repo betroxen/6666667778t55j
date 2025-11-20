@@ -85,9 +85,14 @@ function App() {
     }
   };
 
+  // CSS variable for sidebar width to allow GSAP to animate it smoothly if needed, 
+  // or just use the prop if the Sidebar handles the width animation on the main container.
+  // For this implementation, the sidebar is fixed, so we adjust the main content padding.
+  const sidebarWidth = isCollapsed ? '72px' : '256px';
+
   if (!isLoggedIn) {
     return (
-      <div className="bg-foundation text-text-primary font-rajdhani min-h-screen flex flex-col">
+      <div className="bg-[#050505] text-white font-rajdhani min-h-screen flex flex-col overflow-x-hidden">
         <LoginModal />
         <RegisterModal />
         <Toaster />
@@ -97,7 +102,7 @@ function App() {
           onOpenLogin={openLoginModal}
           onOpenRegister={openRegisterModal}
         />
-        <main className="flex-grow">
+        <main className="flex-grow pt-16">
           <HomePage onRegisterClick={openRegisterModal} />
         </main>
         <Footer />
@@ -106,11 +111,12 @@ function App() {
   }
 
   return (
-    <div className="bg-foundation text-text-primary font-rajdhani min-h-screen">
+    <div className="bg-[#050505] text-white font-rajdhani min-h-screen overflow-x-hidden">
       <LoginModal />
       <RegisterModal />
       <ReviewModal />
       <Toaster />
+      
       <Header
         isLoggedIn={isLoggedIn}
         onLogout={logout}
@@ -119,18 +125,20 @@ function App() {
         onOpenReview={openReviewModal}
         onToggleMobileNav={() => setIsMobileOpen(!isMobileOpen)}
       />
+      
       <Sidebar
         isCollapsed={isCollapsed}
         setIsCollapsed={appContext.setIsCollapsed}
         isMobileOpen={isMobileOpen}
         setIsMobileOpen={setIsMobileOpen}
       />
+
       <div
-        className={`relative flex flex-col min-h-screen transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] md:pl-[var(--sidebar-width)]`}
-        style={{ '--sidebar-width': isCollapsed ? '72px' : '256px' } as React.CSSProperties}
+        className="relative flex flex-col min-h-screen transition-all duration-500 ease-out md:pl-[var(--sidebar-width)]"
+        style={{ '--sidebar-width': sidebarWidth } as React.CSSProperties}
       >
-        <main className="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-grow pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1900px] mx-auto">
              {renderPage()}
           </div>
         </main>
